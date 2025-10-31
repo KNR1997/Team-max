@@ -1,3 +1,6 @@
+from rest_framework import status
+from rest_framework.response import Response
+
 from core.permissions.base import allow_permission, ROLE
 from core.views.base import BaseViewSet
 from product.models import Type
@@ -17,7 +20,9 @@ class TypeViewSet(BaseViewSet):
         )
 
     def list(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
+        types = Type.objects.all()
+        serializer = TypeSerializer(types, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def retrieve(self, request, *args, **kwargs):
         return super().retrieve(request, *args, **kwargs)
