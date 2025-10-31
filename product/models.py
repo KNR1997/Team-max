@@ -6,7 +6,7 @@ from core.models.base import BaseModel
 # Create your models here.
 class Type(BaseModel):
     name = models.CharField(max_length=20, unique=True)
-    icon = models.CharField(max_length=20)
+    icon = models.CharField(max_length=20, null=True, blank=True)
     slug = models.SlugField(max_length=20, unique=True)
     translated_languages = models.JSONField(default=list)
     settings = models.JSONField(null=True, blank=True)
@@ -53,7 +53,7 @@ class Category(models.Model):
 
 class Tag(models.Model):
     name = models.CharField(max_length=20, unique=True)
-    icon = models.CharField(max_length=20)
+    icon = models.CharField(max_length=20, null=True, blank=True)
     slug = models.SlugField(max_length=20, unique=True)
 
     # ForeignKey to Type (a tag belongs to one Type)

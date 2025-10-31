@@ -47,7 +47,7 @@ urlpatterns = [
         name="tag",
     ),
     path(
-        "tags/<int:pk>",
+        "tags/<str:slug>/",
         TagViewSet.as_view({
             "get": "retrieve",
             "put": "update",

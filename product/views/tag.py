@@ -11,8 +11,11 @@ from product.serializers import TagListSerializer, TagSerializer
 class TagViewSet(BaseViewSet):
     model = Tag
     serializer_class = TagListSerializer
+
     search_fields = ["name", "slug"]
     filterset_fields = ["type__id"]
+
+    lookup_field = "slug"
 
     def get_queryset(self):
         return (
@@ -36,12 +39,6 @@ class TagViewSet(BaseViewSet):
 
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
-
-    def retrieve(self, request, *args, **kwargs):
-        return super().retrieve(request, *args, **kwargs)
-
-    # def create(self, request, *args, **kwargs):
-    #     return super().create(request, *args, **kwargs)
 
     def partial_update(self, request, *args, **kwargs):
         return super().partial_update(request, *args, **kwargs)
