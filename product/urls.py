@@ -32,7 +32,7 @@ urlpatterns = [
         name="category",
     ),
     path(
-        "categories/<int:pk>",
+        "categories/<str:slug>/",
         CategoryViewSet.as_view({
             "get": "retrieve",
             "put": "update",
@@ -77,7 +77,7 @@ urlpatterns = [
         name="coupon",
     ),
     path(
-        "coupons/<int:pk>",
+        "coupons/<str:code>",
         CouponViewSet.as_view({
             "get": "retrieve",
             "put": "update",
