@@ -1,6 +1,7 @@
 from django.urls import path
 
-from accounts.views import SignupView, SigninView, CreateAdminView, MeView
+from accounts.views.admin import AdminViewSet
+from accounts.views.auth import SignupView, SigninView, CreateAdminView, MeView
 
 # from accounts.views import SignupView, SigninView
 
@@ -15,4 +16,10 @@ urlpatterns = [
     path('token', SigninView.as_view(), name='token'),
     path('create-admin/', CreateAdminView.as_view(), name='create_admin'),
     path('me', MeView.as_view(), name='me'),
+
+    path(
+        "admin/",
+        AdminViewSet.as_view({"get": "list"}),
+        name="admin",
+    ),
 ]

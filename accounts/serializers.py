@@ -106,3 +106,15 @@ class UserLiteSerializer(BaseSerializer):
     class Meta:
         model = User
         fields = ['username', 'mobile_number', 'email']
+
+
+class AdminSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = '__all__'
+
+
+class AdminListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'mobile_number', 'email', 'display_name', 'first_name', 'last_name']
