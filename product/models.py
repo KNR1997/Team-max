@@ -8,10 +8,11 @@ class Type(BaseModel):
     name = models.CharField(max_length=20, unique=True)
     icon = models.CharField(max_length=20, null=True, blank=True)
     slug = models.SlugField(max_length=20, unique=True)
-    translated_languages = models.JSONField(default=list)
     settings = models.JSONField(null=True, blank=True)
     banners = models.JSONField(default=list, null=True, blank=True)
     promotional_sliders = models.JSONField(default=list, null=True, blank=True)
+    language = models.CharField(max_length=10)
+    translated_languages = models.JSONField(default=["en"], blank=True)
 
     class Meta:
         db_table = "type"
@@ -24,9 +25,10 @@ class Category(models.Model):
     name = models.CharField(max_length=20, unique=True)
     slug = models.SlugField(max_length=20)
     details = models.TextField(null=True, blank=True)
-    icon = models.CharField(max_length=20)
+    icon = models.CharField(max_length=20, null=True, blank=True)
     image = models.JSONField(null=True, blank=True)
-    translated_languages = models.JSONField(default=list, blank=True)
+    language = models.CharField(max_length=10)
+    translated_languages = models.JSONField(default=["en"], blank=True)
 
     # ForeignKey to Type (many categories can belong to one type)
     type = models.ForeignKey(
@@ -55,6 +57,8 @@ class Tag(models.Model):
     name = models.CharField(max_length=20, unique=True)
     icon = models.CharField(max_length=20, null=True, blank=True)
     slug = models.SlugField(max_length=20, unique=True)
+    language = models.CharField(max_length=10)
+    translated_languages = models.JSONField(default=["en"], blank=True)
 
     # ForeignKey to Type (a tag belongs to one Type)
     type = models.ForeignKey(
@@ -108,6 +112,8 @@ class Product(models.Model):
     image = models.JSONField(null=True, blank=True)
     gallery = models.JSONField(default=list, null=True, blank=True)
     quantity = models.IntegerField(null=True, blank=True)
+    language = models.CharField(max_length=10)
+    translated_languages = models.JSONField(default=["en"], blank=True)
 
     # --- Relationships ---
     categories = models.ManyToManyField(Category, related_name="products", blank=True)
@@ -128,8 +134,7 @@ class CouponType(models.TextChoices):
 
 class Coupon(models.Model):
     code = models.CharField(max_length=20, unique=True)
-    language = models.CharField(max_length=20)
-    description = models.TextField(null=True)
+    description = models.TextField(null=True, blank=True)
     type = models.CharField(max_length=20, choices=CouponType.choices, db_index=True)
     amount = models.FloatField()
     minimum_cart_amount = models.FloatField()
@@ -137,7 +142,8 @@ class Coupon(models.Model):
     expire_at = models.DateTimeField()
     is_valid = models.BooleanField(default=False)
     # target = models.IntegerField()
-    translated_languages = models.JSONField(default=list)
+    language = models.CharField(max_length=10)
+    translated_languages = models.JSONField(default=["en"], blank=True)
 
     class Meta:
         db_table = "coupon"
