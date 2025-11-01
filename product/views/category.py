@@ -11,8 +11,11 @@ from product.serializers import CategoryListSerializer, CategorySerializer
 class CategoryViewSet(BaseViewSet):
     model = Category
     serializer_class = CategoryListSerializer
+
     search_fields = ["name", "slug"]
     filterset_fields = ["type__id"]
+
+    lookup_field = "slug"
 
     def get_queryset(self):
         return (
@@ -22,13 +25,6 @@ class CategoryViewSet(BaseViewSet):
     def create(self, request):
         try:
             serializer = CategorySerializer(data=request.data)
-            type = request.data.get("type", False)
-
-            if not type:
-                return Response(
-                    {"error": "Both name and slug are required"},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
 
             if serializer.is_valid(raise_exception=True):
                 serializer.save()

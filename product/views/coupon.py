@@ -8,8 +8,11 @@ from product.serializers import CouponSerializer
 class CouponViewSet(BaseViewSet):
     model = Coupon
     serializer_class = CouponSerializer
+
     search_fields = ["code"]
     filterset_fields = []
+
+    lookup_field = "code"
 
     def get_queryset(self):
         return (
