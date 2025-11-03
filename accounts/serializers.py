@@ -102,6 +102,12 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         return data
 
 
+class UserSerializer(BaseSerializer):
+    class Meta:
+        model = User
+        fields = '__all__'
+
+
 class UserLiteSerializer(BaseSerializer):
     class Meta:
         model = User
@@ -115,6 +121,12 @@ class AdminSerializer(serializers.ModelSerializer):
 
 
 class AdminListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'mobile_number', 'email', 'display_name', 'first_name', 'last_name']
+
+
+class CustomerListSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username', 'mobile_number', 'email', 'display_name', 'first_name', 'last_name']

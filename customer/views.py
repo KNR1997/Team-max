@@ -3,6 +3,7 @@ from rest_framework import status
 from rest_framework.response import Response
 
 from accounts.models import User
+from core.permissions.base import ROLE
 from core.views.base import BaseViewSet
 from customer.serializers import CustomerListSerializer, CustomerSerializer
 
@@ -40,7 +41,9 @@ class CustomerViewSet(BaseViewSet):
                 )
 
     def list(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
+        customers = User.objects.filter(role=ROLE.CUSTOMER.value)
+        serializer = self.serializer_class(customers, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def retrieve(self, request, *args, **kwargs):
         return super().retrieve(request, *args, **kwargs)

@@ -19,7 +19,12 @@ urlpatterns = [
     path('me', MeView.as_view(), name='me'),
 
     path(
-        "admin/",
+        "admin/list/",
+        AdminViewSet.as_view({"get": "list"}),
+        name="admin",
+    ),
+    path(
+        "users/",
         AdminViewSet.as_view({"get": "list"}),
         name="admin",
     ),

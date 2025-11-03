@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from core.serializers.base import BaseSerializer
-from .models import Type, Category, Tag, Product, Coupon
+from .models import Type, Category, Tag, Product, Manufacturer, Author
 
 
 class TypeSerializer(serializers.ModelSerializer):
@@ -54,13 +54,25 @@ class ProductListSerializer(BaseSerializer):
         fields = "__all__"
 
 
-class CouponSerializer(BaseSerializer):
+class ManufacturerSerializer(BaseSerializer):
     class Meta:
-        model = Coupon
+        model = Manufacturer
         fields = '__all__'
 
 
-class CouponListSerializer(BaseSerializer):
+class ManufacturerListSerializer(BaseSerializer):
     class Meta:
-        model = Coupon
+        model = Manufacturer
+        fields = '__all__'
+
+
+class AuthorSerializer(BaseSerializer):
+    class Meta:
+        model = Author
+        fields = '__all__'
+
+
+class AuthorListSerializer(BaseSerializer):
+    class Meta:
+        model = Author
         fields = '__all__'

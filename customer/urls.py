@@ -4,7 +4,7 @@ from customer.views import CustomerViewSet
 
 urlpatterns = [
     path(
-        "customers/",
+        "customers/list/",
         CustomerViewSet.as_view({"get": "list", "post": "create"}),
         name="customer",
     ),

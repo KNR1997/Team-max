@@ -1,8 +1,9 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
+from product.views.author import AuthorViewSet
 from product.views.category import CategoryViewSet
-from product.views.coupon import CouponViewSet
+from product.views.manufacturer import ManufacturerViewSet
 from product.views.product import ProductViewSet
 from product.views.tag import TagViewSet
 from product.views.type import TypeViewSet
@@ -72,19 +73,33 @@ urlpatterns = [
         name="product",
     ),
     path(
-        "coupons/",
-        CouponViewSet.as_view({"get": "list", "post": "create"}),
-        name="coupon",
+        "manufacturers/",
+        ManufacturerViewSet.as_view({"get": "list", "post": "create"}),
+        name="manufacturers",
     ),
     path(
-        "coupons/<str:code>",
-        CouponViewSet.as_view({
+        "manufacturers/<int:pk>",
+        ManufacturerViewSet.as_view({
             "get": "retrieve",
             "put": "update",
             "patch": "partial_update",
             "delete": "destroy",
         }),
-        name="coupon",
-    )
-
+        name="manufacturers",
+    ),
+    path(
+        "authors/",
+        AuthorViewSet.as_view({"get": "list", "post": "create"}),
+        name="authors",
+    ),
+    path(
+        "authors/<int:pk>",
+        AuthorViewSet.as_view({
+            "get": "retrieve",
+            "put": "update",
+            "patch": "partial_update",
+            "delete": "destroy",
+        }),
+        name="authors",
+    ),
 ]

@@ -57,7 +57,9 @@ INSTALLED_APPS = [
     'order',
     'settings',
     'layouts',
-    'feedbacks'
+    'feedbacks',
+    'promotions',
+    'ecommerce'
 ]
 
 REST_FRAMEWORK = {

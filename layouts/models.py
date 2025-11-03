@@ -1,5 +1,7 @@
 from django.db import models
 
+from core.utils.default_language import default_translated_languages
+
 
 # Create your models here.
 class FAQ(models.Model):
@@ -9,7 +11,7 @@ class FAQ(models.Model):
     faq_type = models.CharField(max_length=55, default='global', blank=True, null=True)
     issued_by = models.CharField(max_length=25, default='Super Admin', blank=True, null=True)
     language = models.CharField(max_length=10, default="en")
-    translated_languages = models.JSONField(default=["en"])
+    translated_languages = models.JSONField(default=default_translated_languages, blank=True)
 
     def __str__(self):
         return self.faq_title
@@ -23,7 +25,7 @@ class TermsAndConditions(models.Model):
     issued_by = models.CharField(max_length=25, default='Super Admin', blank=True, null=True)
     is_approved = models.BooleanField(default=True)
     language = models.CharField(max_length=10, default="en")
-    translated_languages = models.JSONField(default=["en"])
+    translated_languages = models.JSONField(default=default_translated_languages, blank=True)
 
     def __str__(self):
         return self.title
