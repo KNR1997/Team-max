@@ -18,7 +18,7 @@ urlpatterns = [
         name="type",
     ),
     path(
-        "types/<uuid:pk>",
+        "types/<str:slug>/",
         TypeViewSet.as_view({
             "get": "retrieve",
             "put": "update",
