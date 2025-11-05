@@ -17,7 +17,11 @@ class CustomerViewSet(BaseViewSet):
 
     def get_queryset(self):
         return (
-            self.filter_queryset(super().get_queryset())
+            self.filter_queryset(
+                super()
+                .get_queryset()
+                .filter(role=ROLE.CUSTOMER.value)
+            )
         )
 
     def create(self, request, *args, **kwargs):
@@ -41,9 +45,7 @@ class CustomerViewSet(BaseViewSet):
                 )
 
     def list(self, request, *args, **kwargs):
-        customers = User.objects.filter(role=ROLE.CUSTOMER.value)
-        serializer = self.serializer_class(customers, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return super().list(request, *args, **kwargs)
 
     def retrieve(self, request, *args, **kwargs):
         return super().retrieve(request, *args, **kwargs)
