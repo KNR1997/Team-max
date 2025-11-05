@@ -11,8 +11,11 @@ from product.serializers import TypeSerializer
 class TypeViewSet(BaseViewSet):
     model = Type
     serializer_class = TypeSerializer
+
     search_fields = ["name", "slug"]
     filterset_fields = []
+
+    lookup_field = "slug"
 
     def get_queryset(self):
         return (
