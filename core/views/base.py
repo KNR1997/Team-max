@@ -1,3 +1,7 @@
+import traceback
+
+from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import IntegrityError
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
@@ -38,11 +42,36 @@ class BaseViewSet(ModelViewSet):
             response = super().handle_exception(exc)
             return response
         except Exception as e:
+            (
+                print(e, traceback.format_exc())
+                if settings.DEBUG
+                else print("Server Error")
+            )
             if isinstance(e, IntegrityError):
                 return Response(
                     {"error": "The payload is not valid"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
+
+            if isinstance(e, ValidationError):
+                return Response(
+                    {"error": "Please provide valid detail"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            if isinstance(e, ObjectDoesNotExist):
+                return Response(
+                    {"error": "The required object does not exist."},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+
+            if isinstance(e, KeyError):
+                log_exception(e)
+                return Response(
+                    {"error": "The required key does not exist."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
             log_exception(e)
             return Response(
                 {"error": "Something went wrong please try again later"},
@@ -55,7 +84,7 @@ class BaseAPIView(APIView):
 
     filter_backends = (DjangoFilterBackend, SearchFilter)
 
-    authentication_classes = []
+    authentication_classes = [JWTAuthentication]
 
     filterset_fields = []
 
@@ -80,6 +109,25 @@ class BaseAPIView(APIView):
                     {"error": "The payload is not valid"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
+
+            if isinstance(e, ValidationError):
+                return Response(
+                    {"error": "Please provide valid detail"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            if isinstance(e, ObjectDoesNotExist):
+                return Response(
+                    {"error": "The requested resource does not exist."},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+
+            if isinstance(e, KeyError):
+                return Response(
+                    {"error": "The required key does not exist."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
             log_exception(e)
             return Response(
                 {"error": "Something went wrong please try again later"},
