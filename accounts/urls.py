@@ -3,6 +3,7 @@ from rest_framework_simplejwt.views import TokenRefreshView
 
 from accounts.views.admin import AdminViewSet
 from accounts.views.auth import SignupView, SigninView, CreateAdminView, MeView
+from accounts.views.user import UserViewSet, UserBlockEndpoint, UserUnblockEndpoint
 
 # from accounts.views import SignupView, SigninView
 
@@ -25,7 +26,17 @@ urlpatterns = [
     ),
     path(
         "users/",
-        AdminViewSet.as_view({"get": "list"}),
-        name="admin",
+        UserViewSet.as_view({"get": "list"}),
+        name="user",
+    ),
+    path(
+        "users/block-user",
+        UserBlockEndpoint.as_view(),
+        name="user-block",
+    ),
+    path(
+        "users/unblock-user",
+        UserUnblockEndpoint.as_view(),
+        name="user-unblock",
     ),
 ]
