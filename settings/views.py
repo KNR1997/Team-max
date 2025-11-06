@@ -5,6 +5,8 @@ from core.views.base import BaseAPIView
 
 # Create your views here.
 class SettingsViewSet(BaseAPIView):
+    authentication_classes = []
+
     def get(self, request):
         settings_obj = {
             "id": 1,
