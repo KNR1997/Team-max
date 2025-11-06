@@ -108,10 +108,16 @@ class UserSerializer(BaseSerializer):
         fields = '__all__'
 
 
+class UserListSerializer(BaseSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'mobile_number', 'email', 'is_active']
+
+
 class UserLiteSerializer(BaseSerializer):
     class Meta:
         model = User
-        fields = ['username', 'mobile_number', 'email']
+        fields = ['username', 'mobile_number', 'email', 'first_name', 'last_name']
 
 
 class AdminSerializer(serializers.ModelSerializer):
@@ -123,10 +129,10 @@ class AdminSerializer(serializers.ModelSerializer):
 class AdminListSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'mobile_number', 'email', 'display_name', 'first_name', 'last_name']
+        fields = ['id', 'username', 'mobile_number', 'email', 'display_name', 'first_name', 'last_name', 'is_active']
 
 
 class CustomerListSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'mobile_number', 'email', 'display_name', 'first_name', 'last_name']
+        fields = ['id', 'username', 'mobile_number', 'email', 'display_name', 'first_name', 'last_name', 'is_active']
