@@ -13,7 +13,7 @@ class TagViewSet(BaseViewSet):
     serializer_class = TagListSerializer
 
     search_fields = ["name", "slug"]
-    filterset_fields = ["type__id"]
+    filterset_fields = ["type__slug"]
 
     lookup_field = "slug"
 

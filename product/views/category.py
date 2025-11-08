@@ -13,7 +13,7 @@ class CategoryViewSet(BaseViewSet):
     serializer_class = CategoryListSerializer
 
     search_fields = ["name", "slug"]
-    filterset_fields = ["type__id"]
+    filterset_fields = ["type__slug"]
 
     lookup_field = "slug"
 
@@ -36,7 +36,6 @@ class CategoryViewSet(BaseViewSet):
                     {"slug": "The category with the slug already exists"},
                     status=status.HTTP_409_CONFLICT,
                 )
-
 
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
