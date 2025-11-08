@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from slugify import slugify
 
 from core.serializers.base import BaseSerializer
 from .models import Type, Category, Tag, Product, Manufacturer, Author
@@ -14,6 +15,16 @@ class CategorySerializer(BaseSerializer):
     class Meta:
         model = Category
         fields = '__all__'
+        read_only_fields = ['slug']
+
+    def create(self, validated_data):
+        name = validated_data.get("name")
+        slug = slugify(name)
+
+        return Category.objects.create(
+            **validated_data,
+            slug=slug
+        )
 
 
 class CategoryListSerializer(BaseSerializer):
@@ -28,6 +39,16 @@ class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
         fields = '__all__'
+        read_only_fields = ['slug']
+
+    def create(self, validated_data):
+        name = validated_data.get("name")
+        slug = slugify(name)
+
+        return Tag.objects.create(
+            **validated_data,
+            slug=slug
+        )
 
 
 class TagListSerializer(serializers.ModelSerializer):
@@ -42,6 +63,16 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = '__all__'
+        read_only_fields = ['slug', 'categories', 'tags']
+
+    def create(self, validated_data):
+        name = validated_data.get("name")
+        slug = slugify(name)
+
+        product = Product.objects.create(
+            **validated_data, slug=slug
+        )
+        return product
 
 
 class ProductListSerializer(BaseSerializer):
