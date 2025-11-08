@@ -59,7 +59,8 @@ INSTALLED_APPS = [
     'layouts',
     'feedbacks',
     'promotions',
-    'ecommerce'
+    'ecommerce',
+    'shops'
 ]
 
 REST_FRAMEWORK = {
