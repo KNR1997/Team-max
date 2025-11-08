@@ -1,6 +1,9 @@
+from rest_framework import status
+from rest_framework.response import Response
+
 from core.views.base import BaseViewSet
 from product.models import Manufacturer
-from product.serializers import ManufacturerListSerializer
+from product.serializers import ManufacturerListSerializer, ManufacturerSerializer
 
 
 # Create your views here.
@@ -19,7 +22,12 @@ class ManufacturerViewSet(BaseViewSet):
         )
 
     def create(self, request, *args, **kwargs):
-        return super().create(request, *args, **kwargs)
+        serializer = ManufacturerSerializer(data=request.data)
+
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            data = serializer.data
+            return Response(data, status=status.HTTP_201_CREATED)
 
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
