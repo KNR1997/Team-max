@@ -5,6 +5,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from accounts.models import User
 from core.serializers.base import BaseSerializer
+from shops.serializers import ShopLiteSerializer
 
 
 # class RegisterSerializer(serializers.ModelSerializer):
@@ -115,9 +116,11 @@ class UserListSerializer(BaseSerializer):
 
 
 class UserLiteSerializer(BaseSerializer):
+    shops = ShopLiteSerializer(read_only=True, many=True)
+
     class Meta:
         model = User
-        fields = ['username', 'mobile_number', 'email', 'first_name', 'last_name']
+        fields = ['username', 'mobile_number', 'email', 'first_name', 'last_name', 'shops']
 
 
 class AdminSerializer(serializers.ModelSerializer):
