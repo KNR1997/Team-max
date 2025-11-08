@@ -93,7 +93,7 @@ urlpatterns = [
         name="authors",
     ),
     path(
-        "authors/<int:pk>",
+        "authors/<str:slug>",
         AuthorViewSet.as_view({
             "get": "retrieve",
             "put": "update",
