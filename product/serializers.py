@@ -89,6 +89,16 @@ class ManufacturerSerializer(BaseSerializer):
     class Meta:
         model = Manufacturer
         fields = '__all__'
+        read_only_fields = ['slug']
+
+    def create(self, validated_data):
+        name = validated_data.get("name")
+        slug = slugify(name)
+
+        manufacturer = Manufacturer.objects.create(
+            **validated_data, slug=slug
+        )
+        return manufacturer
 
 
 class ManufacturerListSerializer(BaseSerializer):
@@ -101,6 +111,16 @@ class AuthorSerializer(BaseSerializer):
     class Meta:
         model = Author
         fields = '__all__'
+        read_only_fields = ['slug']
+
+    def create(self, validated_data):
+        name = validated_data.get("name")
+        slug = slugify(name)
+
+        author = Author.objects.create(
+            **validated_data, slug=slug
+        )
+        return author
 
 
 class AuthorListSerializer(BaseSerializer):
