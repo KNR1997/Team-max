@@ -2,6 +2,11 @@
 
 ## Phase 0 --- Discovery and decisions
 
+Status: decisions recorded 2026-10-20 (see `docs/15` and `docs/adr/`).
+The exit gate is satisfied subject to named-owner sign-off in `docs/01`
+§1; ADR-0001 (modular monolith) remains proposed until the technical
+owner signs it.
+
 Deliverables: - Stakeholder-approved MVP scope. - Confirmed tenancy,
 visibility, roles, retention, RPO/RTO, and deployment assumptions. -
 Context map and first ADRs. - Initial threat model and test strategy.

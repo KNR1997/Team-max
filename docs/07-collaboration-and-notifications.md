@@ -9,11 +9,13 @@ boundaries and historical context.
 
 -   Authorized users can add, edit, and delete their comments according
     to policy.
+-   Comment policy (Phase 0): authors edit and delete their own
+    comments; a project admin may delete a comment for moderation;
+    deletion is soft — content is scrubbed and a tombstone plus the
+    minimum audit evidence required by retention policy is kept.
 -   Edited comments show an edited marker and timestamp.
 -   Mentioned users must be eligible to view the referenced resource.
 -   Mention parsing must not create notifications to unauthorized users.
--   Deleted comments should preserve the minimum audit evidence required
-    by retention policy.
 -   Rich text content must be sanitized before rendering.
 
 ## 3. Attachments

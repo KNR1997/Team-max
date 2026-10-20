@@ -51,7 +51,9 @@ progress without relying on disconnected spreadsheets and chat messages.
 ### MVP
 
 -   Authentication and user profile.
--   Organization/workspace membership and role assignment.
+-   Organization membership and role assignment (one workspace is
+    modeled per organization; there is no separate workspace
+    membership).
 -   Teams and projects.
 -   Project membership and visibility.
 -   Work items, comments, labels, priorities, due dates, assignees, and

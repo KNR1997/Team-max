@@ -8,16 +8,21 @@ visibility. Project execution details live in Work Management.
 ## 2. Project fields
 
 Required: - `id` (UUID or equivalent stable identifier) -
-`organization_id` - `name` - `project_key` (unique within agreed
-scope) - `status` - `created_at`, `created_by` - `updated_at`,
-`updated_by`
+`workspace_id` - `organization_id` - `name` - `project_key` (unique
+within agreed scope) - `status` - `created_at`, `created_by` -
+`updated_at`, `updated_by`
+
+A project's workspace and organization are always the same one-to-one
+pair in the MVP (one workspace per organization, `docs/adr/0003`);
+`organization_id` is carried directly so isolation checks never need to
+traverse the workspace.
 
 Optional: - Description, lead, start/end dates, timezone, icon/color,
 archived timestamp, default workflow, estimation configuration.
 
 ## 3. Project lifecycle
 
-Proposed states: - `Active` - `Archived`
+Project lifecycle (Phase 0 confirmed): `Active`, `Archived`.
 
 A later release may add `Planned`, `Paused`, and `Completed` if those
 states represent meaningful business behavior.
@@ -35,6 +40,13 @@ Visibility modes: - **Organization-visible:** Members of the
 organization can discover/access the project, subject to guest
 restrictions. - **Restricted:** Only explicit project members and
 authorized administrators can access it.
+
+Phase 0 resolution: new projects are **Restricted by default**;
+Organization-visible must be chosen explicitly. On an
+Organization-visible project, organization members who are not project
+members get **read-only** access — they can see items and dashboards but
+cannot comment, transition, or otherwise mutate. Visibility may be
+changed by a project admin or an organization admin.
 
 Policy decisions: - The visibility model must be enforced in list
 queries, direct reads, search, exports, notifications, and background
