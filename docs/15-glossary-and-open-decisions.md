@@ -2,93 +2,71 @@
 
 ## Glossary
 
--   **Aggregate:** Cluster of domain objects treated as one consistency
-    boundary.
--   **Aggregate root:** The only object through which an aggregate is
-    modified externally.
--   **Bounded context:** A boundary within which a domain model and
-    language have a specific meaning.
--   **Command:** Request to change state by expressing intent.
--   **Domain event:** A fact that occurred in the domain.
--   **Entity:** Object whose identity persists through changes.
--   **Integration event:** Versioned event contract for another
-    context/system.
--   **Invariant:** Rule that must always hold true.
--   **Port:** An interface describing a dependency required by
-    application/domain logic.
--   **Adapter:** Implementation of a port for a particular technology.
--   **Repository:** Abstraction for retrieving and persisting
-    aggregates.
--   **TDD:** Test-Driven Development: red, green, refactor.
--   **Ubiquitous language:** Shared domain vocabulary used by
-    stakeholders and code.
--   **Value object:** Object defined by its values rather than identity.
--   **Outbox pattern:** Persist business change and event record
-    atomically, then publish asynchronously.
--   **Optimistic concurrency:** Detect conflicting updates using a
-    version/token rather than silently overwriting changes.
+Canonical project vocabulary lives in [`GLOSSARY.md`](../GLOSSARY.md) at
+the repository root. Update terms there; do not duplicate them in this
+document.
 
-## Open decisions requiring stakeholder approval
+## Decisions resolved in Phase 0 (2026-10-20)
 
-  -----------------------------------------------------------------------
-  ID                      Decision                Suggested default
-  ----------------------- ----------------------- -----------------------
-  DEC-001                 Organization versus     Model both, initially
-                          workspace hierarchy     permit one workspace
-                                                  per organization if
-                                                  simpler
+All DEC items below were approved by the Phase 0 reviewers. Architectural
+consequences are recorded in [`docs/adr/`](adr/).
 
-  DEC-002                 Project visibility      Restricted by default;
-                                                  organization-visible
-                                                  must be explicit
+| ID | Decision | Resolution |
+| --- | --- | --- |
+| DEC-001 | Organization versus workspace hierarchy | Organization → Workspace modeled; exactly one workspace per organization, owned by the organization and auto-created at org creation. No workspace-level membership. |
+| DEC-002 | Project visibility | `Restricted` by default; `Organization-visible` must be chosen explicitly and grants non-members read-only access. Visibility is changed by a project admin or an organization admin. |
+| DEC-003 | Can contributors create projects? | No. Project creation requires an explicit permission (organization admin, or a member granted the capability). |
+| DEC-004 | Can assignee be empty? | Yes, but dashboards surface unassigned active work prominently. |
+| DEC-005 | Can users delete work items? | Archive by default; no ordinary hard-delete path exists in MVP. |
+| DEC-006 | Project key mutability | Immutable after creation for MVP; any future rename needs aliases/redirects. |
+| DEC-007 | Workflow versioning | Published versions are immutable; edits create a new version and in-flight items migrate explicitly. |
+| DEC-008 | Authentication | Local email + password behind an OIDC-ready port; no identity provider is mandated. |
+| DEC-009 | Background jobs | Postgres transactional outbox drained by a polling worker; no separate broker for MVP. |
+| DEC-010 | Search | Postgres full-text and trigram indexing; a dedicated engine only on measured need. |
+| DEC-011 | File storage | Private S3-compatible object storage with short-lived signed URLs; malware scanning deferred, adapter seam present. |
+| DEC-012 | Audit retention | Append-only and immutable to ordinary roles confirmed; the retention period is set with legal/security before production (Phase 4 gate). |
+| DEC-013 | RPO/RTO | Working targets RPO ≤ 24 h and RTO ≤ 4 h with daily backups; restore demonstrated in Phase 4. No compliance driver tightens these today. |
+| DEC-014 | API response envelope | The `success` / `data` / `error` / `message` envelope is standardized and applied consistently (`docs/10` §5). |
+| DEC-015 | Time tracking and estimates | Post-MVP unless pilot evidence demands it. |
 
-  DEC-003                 Can contributors create No, unless granted a
-                          projects?               permission
+ADR references:
 
-  DEC-004                 Can assignee be empty?  Yes, but dashboard
-                                                  should surface
-                                                  unassigned active work
+-   DEC-001 → [ADR-0003](adr/0003-single-workspace-tenancy.md)
+-   DEC-007 → [ADR-0004](adr/0004-immutable-workflow-versions.md)
+-   DEC-008 → [ADR-0002](adr/0002-local-auth-with-oidc-seam.md)
+-   DEC-009 → [ADR-0005](adr/0005-postgres-outbox-and-worker.md)
+-   DEC-010 → [ADR-0007](adr/0007-database-search.md)
+-   DEC-011 → [ADR-0006](adr/0006-private-object-storage.md)
+-   DEC-012 → [ADR-0008](adr/0008-audit-retention-and-deletion.md)
 
-  DEC-005                 Can users delete work   Archive by default;
-                          items?                  hard delete restricted
+## Additional Phase 0 resolutions
 
-  DEC-006                 Project key mutability  Immutable after
-                                                  creation for MVP
+Items decided in Phase 0 that were not part of the DEC register:
 
-  DEC-007                 Workflow versioning     Publish new version and
-                                                  explicitly migrate
-                                                  affected items
-
-  DEC-008                 Authentication          Use vetted local auth
-                                                  or OIDC based on
-                                                  company needs
-
-  DEC-009                 Background jobs         Start with a reliable
-                                                  worker/queue adapter;
-                                                  select broker based on
-                                                  operational needs
-
-  DEC-010                 Search                  Start with database
-                                                  capabilities; add
-                                                  dedicated search only
-                                                  when needed
-
-  DEC-011                 File storage            Private S3-compatible
-                                                  storage or equivalent
-
-  DEC-012                 Audit retention         Define with
-                                                  legal/security owner
-                                                  before production
-
-  DEC-013                 RPO/RTO                 Define with business
-                                                  owner; test recovery
-
-  DEC-014                 API response envelope   Standardize one
-                                                  response/error contract
-
-  DEC-015                 Time tracking and       Post-MVP unless
-                          estimates               required by pilot teams
-  -----------------------------------------------------------------------
+-   **Deployment assumptions:** single-host container deployment (Docker
+    Compose) for MVP; separate development and production environments
+    with separate credentials and data; staging added when a shared test
+    environment earns its keep; Kubernetes out of scope for MVP.
+-   **Roles:** organization roles are Owner, Admin, and Member (Guest
+    later); project roles are Admin, Contributor, and Viewer. Roles are
+    presets over an explicit permission matrix, never role-name string
+    checks in code. Team lead is a field on the Team aggregate, not an
+    organization role.
+-   **Comment policy:** authors edit and delete their own comments;
+    project admins may delete for moderation; deletion is soft, keeping a
+    tombstone and the minimum audit evidence required by retention
+    policy.
+-   **User deletion:** deleted users are tombstoned (stable ID and
+    historical authorship preserved) and cannot be deleted while they own
+    active work. See
+    [ADR-0008](adr/0008-audit-retention-and-deletion.md).
+-   **Confirmed proposed defaults:** project lifecycle is Active and
+    Archived only; work item types are Task, Bug, Feature, and Story;
+    membership lifecycle is Invited, Active, Suspended, and Removed;
+    project keys are 2--10 uppercase alphanumerics.
+-   **Approvers:** one product owner and one technical lead sign off on
+    MVP scope and the release acceptance checklist (names to be recorded
+    in `docs/01` §1).
 
 ## Change management
 

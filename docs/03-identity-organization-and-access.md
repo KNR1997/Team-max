@@ -31,9 +31,16 @@ settings, members, and workflow configuration. - **Contributor:**
 Creates and updates work items within allowed policies. - **Viewer:**
 Read-only access.
 
-Roles are starting presets. Prefer explicit permissions/policies in the
-authorization layer rather than scattering role-name comparisons through
-the code.
+Roles are starting presets confirmed in Phase 0: organization roles are
+Owner, Admin, and Member (Guest/External Viewer later); project roles are
+Admin, Contributor, and Viewer. Prefer explicit permissions/policies in
+the authorization layer rather than scattering role-name comparisons
+through the code. Team lead is a field on the Team aggregate, not an
+organization role.
+
+There is no workspace-level membership: organization membership is the
+only tenancy-level membership, since an organization has exactly one
+workspace in the MVP (`docs/adr/0003-single-workspace-tenancy.md`).
 
 ## 4. Authorization policy
 

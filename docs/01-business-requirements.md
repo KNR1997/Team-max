@@ -2,10 +2,12 @@
 
 ## 1. Document control
 
--   **Status:** Draft v0.1
--   **Business owner:** To be assigned
--   **Technical owner:** To be assigned
--   **Approval:** Product owner and engineering lead
+-   **Status:** Draft v0.2 (Phase 0 decisions resolved 2026-10-20)
+-   **Business owner:** Product owner — *name to be recorded here*
+-   **Technical owner:** Engineering lead — *name to be recorded here*
+-   **Approval:** Product owner and engineering lead. Phase 0 scope and
+    the resolutions in `docs/15` await their sign-off; a single named
+    approver signs the release acceptance checklist.
 -   **Review cadence:** At each major release
 
 ## 2. Business problem
@@ -200,11 +202,21 @@ later enhancement.
 
 ## 9. Open decisions
 
--   Is one organization allowed to contain multiple workspaces in the
-    first release?
--   Can a project be visible to all organization members, or only
-    explicit members?
--   Is a work item required to have an assignee?
--   What is the policy for deleting users who own historical work?
--   Which identity provider/SSO is required?
--   What RPO/RTO and retention periods are acceptable?
+Resolved in Phase 0 (2026-10-20); full resolutions and ADR references
+live in `docs/15`:
+
+-   One workspace per organization, modeled from the start, with no
+    separate workspace membership.
+-   Projects default to `Restricted` visibility; `Organization-visible`
+    is explicit and read-only for non-members.
+-   A work item may have an empty assignee, but dashboards surface
+    unassigned active work.
+-   Users who own historical work are tombstoned, not erased; deletion
+    is blocked while they own active work.
+-   Local email + password authentication behind an OIDC-ready port; no
+    identity provider is mandated.
+-   Working RPO ≤ 24 h / RTO ≤ 4 h with daily backups, tested in
+    Phase 4; no compliance driver tightens this.
+
+Remaining open item: the retention period for audit records, to be set
+with the legal/security owner before production (Phase 4 gate).
