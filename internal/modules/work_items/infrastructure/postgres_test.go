@@ -1,12 +1,14 @@
 //go:build integration
 
-package task
+package infrastructure
 
 import (
 	"context"
 	"errors"
 	"os"
 	"testing"
+
+	"todo/internal/modules/work_items/domain"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -43,7 +45,7 @@ func TestPostgresStore(t *testing.T) {
 
 	store := NewPostgresStore(pool)
 
-	created := &Task{Title: "buy milk", Completed: false}
+	created := &domain.WorkItem{domain.WorkItem{Title: "buy milk", Completed: false}
 
 	if err := store.Create(ctx, created); err != nil {
 		t.Fatalf("Create() error = %v", err)
@@ -82,15 +84,15 @@ func TestPostgresStore(t *testing.T) {
 		t.Fatalf("Delete() error = %v", err)
 	}
 
-	if _, err := store.Get(ctx, created.ID); !errors.Is(err, ErrNotFound) {
-		t.Errorf("Get() after Delete() error = %v, want ErrNotFound", err)
+	if _, err := store.Get(ctx, created.ID); !errors.Is(err, domain.ErrNotFound) {
+		t.Errorf("Get() after Delete() error = %v, want domain.ErrNotFound", err)
 	}
 
-	if err := store.Delete(ctx, created.ID); !errors.Is(err, ErrNotFound) {
-		t.Errorf("Delete() twice error = %v, want ErrNotFound", err)
+	if err := store.Delete(ctx, created.ID); !errors.Is(err, domain.ErrNotFound) {
+		t.Errorf("Delete() twice error = %v, want domain.ErrNotFound", err)
 	}
 
-	if err := store.Update(ctx, &Task{ID: 999, Title: "ghost"}); !errors.Is(err, ErrNotFound) {
-		t.Errorf("Update() missing error = %v, want ErrNotFound", err)
+	if err := store.Update(ctx, &domain.WorkItem{domain.WorkItem{ID: 999, Title: "ghost"}); !errors.Is(err, domain.ErrNotFound) {
+		t.Errorf("Update() missing error = %v, want domain.ErrNotFound", err)
 	}
 }

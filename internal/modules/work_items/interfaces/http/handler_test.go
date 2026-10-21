@@ -1,4 +1,4 @@
-package task
+package http
 
 import (
 	"bytes"
@@ -11,6 +11,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"todo/internal/modules/work_items/domain"
+
 	"github.com/go-chi/chi/v5"
 )
 
@@ -21,16 +23,16 @@ const (
 )
 
 type fakeStore struct {
-	create func(ctx context.Context, t *Task) error
-	get    func(ctx context.Context, id int64) (*Task, error)
-	list   func(ctx context.Context) ([]Task, error)
-	update func(ctx context.Context, t *Task) error
+	create func(ctx context.Context, t *domain.WorkItem) error
+	get    func(ctx context.Context, id int64) (*domain.WorkItem, error)
+	list   func(ctx context.Context) ([]domain.WorkItem, error)
+	update func(ctx context.Context, t *domain.WorkItem) error
 	del    func(ctx context.Context, id int64) error
 }
 
-var _ Store = (*fakeStore)(nil)
+var _ domain.Repository = (*fakeStore)(nil)
 
-func (f *fakeStore) Create(ctx context.Context, t *Task) error {
+func (f *fakeStore) Create(ctx context.Context, t *domain.WorkItem) error {
 	if f.create == nil {
 		return errors.New("create not implemented")
 	}
@@ -38,7 +40,7 @@ func (f *fakeStore) Create(ctx context.Context, t *Task) error {
 	return f.create(ctx, t)
 }
 
-func (f *fakeStore) Get(ctx context.Context, id int64) (*Task, error) {
+func (f *fakeStore) Get(ctx context.Context, id int64) (*domain.WorkItem, error) {
 	if f.get == nil {
 		return nil, errors.New("get not implemented")
 	}
@@ -46,7 +48,7 @@ func (f *fakeStore) Get(ctx context.Context, id int64) (*Task, error) {
 	return f.get(ctx, id)
 }
 
-func (f *fakeStore) List(ctx context.Context) ([]Task, error) {
+func (f *fakeStore) List(ctx context.Context) ([]domain.WorkItem, error) {
 	if f.list == nil {
 		return nil, errors.New("list not implemented")
 	}
@@ -54,7 +56,7 @@ func (f *fakeStore) List(ctx context.Context) ([]Task, error) {
 	return f.list(ctx)
 }
 
-func (f *fakeStore) Update(ctx context.Context, t *Task) error {
+func (f *fakeStore) Update(ctx context.Context, t *domain.WorkItem) error {
 	if f.update == nil {
 		return errors.New("update not implemented")
 	}
@@ -98,10 +100,10 @@ func doJSON(t *testing.T, h http.Handler, method, target, body string) *httptest
 	return rec
 }
 
-func decodeTaskResponse(t *testing.T, rec *httptest.ResponseRecorder) Task {
+func decodeTaskResponse(t *testing.T, rec *httptest.ResponseRecorder) domain.WorkItem {
 	t.Helper()
 
-	var got Task
+	var got domain.WorkItem
 
 	if err := json.NewDecoder(rec.Body).Decode(&got); err != nil {
 		t.Fatalf("decoding response body: %v", err)
@@ -122,7 +124,7 @@ func TestHandler_create(t *testing.T) {
 	}{
 		{
 			name: caseOK,
-			store: &fakeStore{create: func(_ context.Context, task *Task) error {
+			store: &fakeStore{create: func(_ context.Context, task *domain.WorkItem) error {
 				task.ID = 1
 				return nil
 			}},
@@ -150,7 +152,7 @@ func TestHandler_create(t *testing.T) {
 		},
 		{
 			name: "store error",
-			store: &fakeStore{create: func(_ context.Context, _ *Task) error {
+			store: &fakeStore{create: func(_ context.Context, _ *domain.WorkItem) error {
 				return errors.New("boom")
 			}},
 			body:       `{"title":"buy milk"}`,
@@ -189,15 +191,15 @@ func TestHandler_list(t *testing.T) {
 	}{
 		{
 			name: "multiple tasks",
-			store: &fakeStore{list: func(_ context.Context) ([]Task, error) {
-				return []Task{{ID: 1, Title: "a"}, {ID: 2, Title: "b"}}, nil
+			store: &fakeStore{list: func(_ context.Context) ([]domain.WorkItem, error) {
+				return []domain.WorkItem{{ID: 1, Title: "a"}, {ID: 2, Title: "b"}}, nil
 			}},
 			wantIDs: []int64{1, 2},
 		},
 		{
 			name: "empty list is json array",
-			store: &fakeStore{list: func(_ context.Context) ([]Task, error) {
-				return []Task{}, nil
+			store: &fakeStore{list: func(_ context.Context) ([]domain.WorkItem, error) {
+				return []domain.WorkItem{}, nil
 			}},
 			wantEmpty: true,
 		},
@@ -214,7 +216,7 @@ func TestHandler_list(t *testing.T) {
 				t.Fatalf("status = %d, want %d", rec.Code, http.StatusOK)
 			}
 
-			var got []Task
+			var got []domain.WorkItem
 
 			if err := json.NewDecoder(rec.Body).Decode(&got); err != nil {
 				t.Fatalf("decoding response body: %v", err)
@@ -252,16 +254,16 @@ func TestHandler_get(t *testing.T) {
 	}{
 		{
 			name: caseOK,
-			store: &fakeStore{get: func(_ context.Context, id int64) (*Task, error) {
-				return &Task{ID: id, Title: titleMilk}, nil
+			store: &fakeStore{get: func(_ context.Context, id int64) (*domain.WorkItem, error) {
+				return &domain.WorkItem{domain.WorkItem{ID: id, Title: titleMilk}, nil
 			}},
 			target:     "/tasks/1",
 			wantStatus: http.StatusOK,
 		},
 		{
 			name: "not found",
-			store: &fakeStore{get: func(_ context.Context, _ int64) (*Task, error) {
-				return nil, ErrNotFound
+			store: &fakeStore{get: func(_ context.Context, _ int64) (*domain.WorkItem, error) {
+				return nil, domain.ErrNotFound
 			}},
 			target:     "/tasks/99",
 			wantStatus: http.StatusNotFound,
@@ -299,7 +301,7 @@ func TestHandler_update(t *testing.T) {
 	}{
 		{
 			name: caseOK,
-			store: &fakeStore{update: func(_ context.Context, _ *Task) error {
+			store: &fakeStore{update: func(_ context.Context, _ *domain.WorkItem) error {
 				return nil
 			}},
 			body:       `{"title":"buy oat milk","completed":true}`,
@@ -307,8 +309,8 @@ func TestHandler_update(t *testing.T) {
 		},
 		{
 			name: "not found",
-			store: &fakeStore{update: func(_ context.Context, _ *Task) error {
-				return ErrNotFound
+			store: &fakeStore{update: func(_ context.Context, _ *domain.WorkItem) error {
+				return domain.ErrNotFound
 			}},
 			body:       `{"title":"x"}`,
 			wantStatus: http.StatusNotFound,
@@ -355,7 +357,7 @@ func TestHandler_delete(t *testing.T) {
 		{
 			name: "not found",
 			store: &fakeStore{del: func(_ context.Context, _ int64) error {
-				return ErrNotFound
+				return domain.ErrNotFound
 			}},
 			target:     "/tasks/99",
 			wantStatus: http.StatusNotFound,
@@ -396,7 +398,7 @@ func TestTask_Validate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			task := &Task{Title: tt.title}
+			task := &domain.WorkItem{domain.WorkItem{Title: tt.title}
 
 			err := task.Validate()
 

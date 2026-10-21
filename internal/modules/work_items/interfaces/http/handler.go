@@ -1,4 +1,4 @@
-package task
+package http
 
 import (
 	"encoding/json"
@@ -9,20 +9,21 @@ import (
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
+	"todo/internal/modules/work_items/domain"
 )
 
-// Handler serves the task HTTP API.
+// Handler serves the work item HTTP API.
 type Handler struct {
-	store Store
-	log   *slog.Logger
+	repo domain.Repository
+	log  *slog.Logger
 }
 
-// NewHandler wires a task HTTP handler on store.
-func NewHandler(store Store, log *slog.Logger) *Handler {
-	return &Handler{store: store, log: log}
+// NewHandler wires a work item HTTP handler on the repository.
+func NewHandler(repo domain.Repository, log *slog.Logger) *Handler {
+	return &Handler{repo: repo, log: log}
 }
 
-// Routes mounts the task endpoints on r.
+// Routes mounts the work item endpoints on r.
 func (h *Handler) Routes(r chi.Router) {
 	r.Post("/tasks", h.create)
 	r.Get("/tasks", h.list)
@@ -42,7 +43,7 @@ func (h *Handler) create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.store.Create(r.Context(), t); err != nil {
+	if err := h.repo.Create(r.Context(), t); err != nil {
 		h.internalError(w, err)
 		return
 	}
@@ -51,7 +52,7 @@ func (h *Handler) create(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) list(w http.ResponseWriter, r *http.Request) {
-	tasks, err := h.store.List(r.Context())
+	tasks, err := h.repo.List(r.Context())
 	if err != nil {
 		h.internalError(w, err)
 		return
@@ -66,7 +67,7 @@ func (h *Handler) get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	t, err := h.store.Get(r.Context(), id)
+	t, err := h.repo.Get(r.Context(), id)
 	if err != nil {
 		h.handleError(w, err)
 		return
@@ -93,7 +94,7 @@ func (h *Handler) update(w http.ResponseWriter, r *http.Request) {
 
 	body.ID = id
 
-	if err := h.store.Update(r.Context(), body); err != nil {
+	if err := h.repo.Update(r.Context(), body); err != nil {
 		h.handleError(w, err)
 		return
 	}
@@ -107,7 +108,7 @@ func (h *Handler) delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.store.Delete(r.Context(), id); err != nil {
+	if err := h.repo.Delete(r.Context(), id); err != nil {
 		h.handleError(w, err)
 		return
 	}
@@ -116,8 +117,8 @@ func (h *Handler) delete(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) handleError(w http.ResponseWriter, err error) {
-	if errors.Is(err, ErrNotFound) {
-		writeError(w, http.StatusNotFound, ErrNotFound.Error())
+	if errors.Is(err, domain.ErrNotFound) {
+		writeError(w, http.StatusNotFound, domain.ErrNotFound.Error())
 		return
 	}
 
@@ -139,13 +140,13 @@ func pathID(w http.ResponseWriter, r *http.Request) (int64, bool) {
 	return id, true
 }
 
-func decodeTask(w http.ResponseWriter, r *http.Request) (*Task, bool) {
+func decodeTask(w http.ResponseWriter, r *http.Request) (*domain.WorkItem, bool) {
 	r.Body = http.MaxBytesReader(w, r.Body, 1<<20)
 
 	dec := json.NewDecoder(r.Body)
 	dec.DisallowUnknownFields()
 
-	t := new(Task)
+	t := new(domain.WorkItem)
 
 	if err := dec.Decode(t); err != nil {
 		writeError(w, http.StatusBadRequest, "invalid request body: "+err.Error())

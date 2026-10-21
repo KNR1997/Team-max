@@ -11,7 +11,9 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
-	"todo/internal/task"
+
+	workitemhttp "todo/internal/modules/work_items/interfaces/http"
+	workitempostgres "todo/internal/modules/work_items/infrastructure"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -42,8 +44,8 @@ func run() error {
 		return err
 	}
 
-	store := task.NewPostgresStore(pool)
-	handler := task.NewHandler(store, slog.Default())
+	repo := workitempostgres.NewPostgresRepository(pool)
+	handler := workitemhttp.NewHandler(repo, slog.Default())
 
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)
