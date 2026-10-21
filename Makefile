@@ -1,32 +1,39 @@
 BINARY_NAME=todo
 GO=go
 
-.PHONY: build run test test-integration lint fmt up down clean help
+.PHONY: build run test test-integration lint fmt vet up down clean help check
 
 ## build: Build the application
 build:
-	$(GO) build -o bin/$(BINARY_NAME) ./cmd/server
+	$(GO) build ./...
 
 ## run: Build and run the application
 run: build
-	./bin/$(BINARY_NAME)
+	$(GO) run ./cmd/server
 
 ## test: Run unit tests with race detection
 test:
-	$(GO) test -race -coverprofile=coverage.out ./...
+	$(GO) test -race -count=1 ./...
 
 ## test-integration: Run integration tests (needs TEST_DATABASE_URL)
 test-integration:
-	$(GO) test -race -tags=integration -count=1 ./internal/task/
+	$(GO) test -race -tags=integration -count=1 ./...
 
 ## lint: Run golangci-lint
 lint:
 	golangci-lint run ./...
 
-## fmt: Format and vet
+## fmt: Format code
 fmt:
-	gofmt -s -w cmd internal
+	gofmt -s -w .
+	$(GO) run golang.org/x/tools/cmd/goimports@latest -local todo -w .
+
+## vet: Run go vet
+vet:
 	$(GO) vet ./...
+
+## check: Run fmt, vet, lint, and tests
+check: fmt vet lint test
 
 ## up: Start Postgres
 up:
