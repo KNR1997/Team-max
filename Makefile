@@ -51,3 +51,20 @@ clean:
 help:
 	@echo "Usage: make [target]"
 	@sed -n 's/^##//p' $(MAKEFILE_LIST) | column -t -s ':' | sed -e 's/^/ /'
+
+## migrate-up: Apply all migrations
+migrate-up:
+	migrate -path ./migrations -database "$(DATABASE_URL)" up
+
+## migrate-down: Roll back all migrations
+migrate-down:
+	migrate -path ./migrations -database "$(DATABASE_URL)" down
+
+## migrate-drop: Drop everything
+migrate-drop:
+	migrate -path ./migrations -database "$(DATABASE_URL)" drop -f
+
+## migrate-create: Create a new migration (usage: make migrate-create NAME=add_users)
+migrate-create:
+	@test -n "$(NAME)" || (echo "NAME required" && exit 1)
+	migrate create -ext sql -dir ./migrations -seq $(NAME)
