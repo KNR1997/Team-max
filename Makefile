@@ -52,6 +52,8 @@ help:
 	@echo "Usage: make [target]"
 	@sed -n 's/^##//p' $(MAKEFILE_LIST) | column -t -s ':' | sed -e 's/^/ /'
 
+DATABASE_URL ?= postgres://todo:todo@localhost:5433/todo?sslmode=disable
+
 ## migrate-up: Apply all migrations
 migrate-up:
 	migrate -path ./migrations -database "$(DATABASE_URL)" up
