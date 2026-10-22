@@ -8,9 +8,15 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/go-chi/chi/v5"
 	"todo/internal/modules/work_items/domain"
+
+	"github.com/go-chi/chi/v5"
 )
+
+// ErrorResponse is the JSON body returned for API failures.
+type ErrorResponse struct {
+	Error string `json:"error" example:"title is required"`
+}
 
 // Handler serves the work item HTTP API.
 type Handler struct {
@@ -32,6 +38,18 @@ func (h *Handler) Routes(r chi.Router) {
 	r.Delete("/tasks/{id}", h.delete)
 }
 
+// create handles POST /tasks.
+//
+//	@Summary		Create a work item
+//	@Description	Creates a work item and returns it with its generated ID.
+//	@Tags			work-items
+//	@Accept			json
+//	@Produce		json
+//	@Param			body	body		domain.WorkItem	true	"Work item to create"
+//	@Success		201		{object}	domain.WorkItem
+//	@Failure		400		{object}	ErrorResponse
+//	@Failure		500		{object}	ErrorResponse
+//	@Router			/tasks [post]
 func (h *Handler) create(w http.ResponseWriter, r *http.Request) {
 	t, ok := decodeTask(w, r)
 	if !ok {
@@ -51,6 +69,15 @@ func (h *Handler) create(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusCreated, t)
 }
 
+// list handles GET /tasks.
+//
+//	@Summary		List work items
+//	@Description	Returns all work items ordered by ID.
+//	@Tags			work-items
+//	@Produce		json
+//	@Success		200	{array}		domain.WorkItem
+//	@Failure		500	{object}	ErrorResponse
+//	@Router			/tasks [get]
 func (h *Handler) list(w http.ResponseWriter, r *http.Request) {
 	tasks, err := h.repo.List(r.Context())
 	if err != nil {
@@ -61,6 +88,18 @@ func (h *Handler) list(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, tasks)
 }
 
+// get handles GET /tasks/{id}.
+//
+//	@Summary		Get a work item
+//	@Description	Returns a single work item by ID.
+//	@Tags			work-items
+//	@Produce		json
+//	@Param			id	path		int	true	"Work item ID"
+//	@Success		200	{object}	domain.WorkItem
+//	@Failure		400	{object}	ErrorResponse
+//	@Failure		404	{object}	ErrorResponse
+//	@Failure		500	{object}	ErrorResponse
+//	@Router			/tasks/{id} [get]
 func (h *Handler) get(w http.ResponseWriter, r *http.Request) {
 	id, ok := pathID(w, r)
 	if !ok {
@@ -76,6 +115,20 @@ func (h *Handler) get(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, t)
 }
 
+// update handles PUT /tasks/{id}.
+//
+//	@Summary		Update a work item
+//	@Description	Replaces the stored work item with the given ID.
+//	@Tags			work-items
+//	@Accept			json
+//	@Produce		json
+//	@Param			id		path		int				true	"Work item ID"
+//	@Param			body	body		domain.WorkItem	true	"Replacement work item"
+//	@Success		200		{object}	domain.WorkItem
+//	@Failure		400		{object}	ErrorResponse
+//	@Failure		404		{object}	ErrorResponse
+//	@Failure		500		{object}	ErrorResponse
+//	@Router			/tasks/{id} [put]
 func (h *Handler) update(w http.ResponseWriter, r *http.Request) {
 	id, ok := pathID(w, r)
 	if !ok {
@@ -102,6 +155,17 @@ func (h *Handler) update(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, body)
 }
 
+// delete handles DELETE /tasks/{id}.
+//
+//	@Summary		Delete a work item
+//	@Description	Removes the work item with the given ID.
+//	@Tags			work-items
+//	@Param			id	path	int	true	"Work item ID"
+//	@Success		204	"No content"
+//	@Failure		400	{object}	ErrorResponse
+//	@Failure		404	{object}	ErrorResponse
+//	@Failure		500	{object}	ErrorResponse
+//	@Router			/tasks/{id} [delete]
 func (h *Handler) delete(w http.ResponseWriter, r *http.Request) {
 	id, ok := pathID(w, r)
 	if !ok {
@@ -171,5 +235,5 @@ func writeJSON(w http.ResponseWriter, status int, v any) {
 }
 
 func writeError(w http.ResponseWriter, status int, msg string) {
-	writeJSON(w, status, map[string]string{"error": msg})
+	writeJSON(w, status, ErrorResponse{Error: msg})
 }
