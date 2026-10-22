@@ -8,18 +8,22 @@ import (
 	"net/http"
 	"time"
 
-	workitemhttp "todo/internal/modules/work_items/interfaces/http"
+	_ "todo/internal/api/docs"
 	workitempostgres "todo/internal/modules/work_items/infrastructure"
+	workitemhttp "todo/internal/modules/work_items/interfaces/http"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jackc/pgx/v5/pgxpool"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 // Config holds server configuration.
 type Config struct {
 	Addr        string
 	DatabaseURL string
+	// SwaggerEnabled controls the /swagger UI endpoint. Disable in production.
+	SwaggerEnabled bool
 }
 
 // Server wires and runs the HTTP server.
@@ -58,6 +62,10 @@ func (s *Server) Run(ctx context.Context) error {
 	r.Use(middleware.Timeout(60 * time.Second))
 
 	handler.Routes(r)
+
+	if s.cfg.SwaggerEnabled {
+		r.Get("/swagger/*", httpSwagger.Handler())
+	}
 
 	r.Get("/healthz", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)

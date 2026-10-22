@@ -1,7 +1,7 @@
 BINARY_NAME=todo
 GO=go
 
-.PHONY: build run test test-integration lint fmt vet up down clean help check
+.PHONY: build run test test-integration lint fmt vet up down clean help check swagger
 
 ## build: Build the application
 build:
@@ -34,6 +34,10 @@ vet:
 
 ## check: Run fmt, vet, lint, and tests
 check: fmt vet lint test
+
+## swagger: Regenerate the OpenAPI spec in internal/api/docs
+swagger:
+	$(GO) tool swag init -g cmd/server/main.go -o ./internal/api/docs --parseInternal --exclude ./internal/api/docs
 
 ## up: Start Postgres
 up:

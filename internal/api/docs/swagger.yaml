@@ -1,0 +1,170 @@
+basePath: /
+definitions:
+  domain.WorkItem:
+    properties:
+      completed:
+        type: boolean
+      id:
+        type: integer
+      title:
+        type: string
+    type: object
+  http.ErrorResponse:
+    properties:
+      error:
+        example: title is required
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Internal project management platform HTTP API.
+  title: Team-max API
+  version: "1.0"
+paths:
+  /tasks:
+    get:
+      description: Returns all work items ordered by ID.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.WorkItem'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      summary: List work items
+      tags:
+      - work-items
+    post:
+      consumes:
+      - application/json
+      description: Creates a work item and returns it with its generated ID.
+      parameters:
+      - description: Work item to create
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/domain.WorkItem'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.WorkItem'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      summary: Create a work item
+      tags:
+      - work-items
+  /tasks/{id}:
+    delete:
+      description: Removes the work item with the given ID.
+      parameters:
+      - description: Work item ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      summary: Delete a work item
+      tags:
+      - work-items
+    get:
+      description: Returns a single work item by ID.
+      parameters:
+      - description: Work item ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.WorkItem'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      summary: Get a work item
+      tags:
+      - work-items
+    put:
+      consumes:
+      - application/json
+      description: Replaces the stored work item with the given ID.
+      parameters:
+      - description: Work item ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Replacement work item
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/domain.WorkItem'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.WorkItem'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      summary: Update a work item
+      tags:
+      - work-items
+schemes:
+- http
+swagger: "2.0"
