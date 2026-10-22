@@ -53,7 +53,6 @@ func (s *Server) Run(ctx context.Context) error {
 
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)
-	r.Use(middleware.RealIP)
 	r.Use(middleware.Recoverer)
 	r.Use(s.requestLogger)
 	r.Use(middleware.Timeout(60 * time.Second))

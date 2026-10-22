@@ -72,7 +72,7 @@ func (f *fakeStore) Delete(ctx context.Context, id int64) error {
 	return f.del(ctx, id)
 }
 
-func newTestHandler(t *testing.T, store Store) http.Handler {
+func newTestHandler(t *testing.T, store domain.Repository) http.Handler {
 	t.Helper()
 
 	log := slog.New(slog.DiscardHandler)
@@ -117,7 +117,7 @@ func TestHandler_create(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		store      Store
+		store      domain.Repository
 		body       string
 		wantStatus int
 		wantTitle  string
@@ -185,7 +185,7 @@ func TestHandler_list(t *testing.T) {
 
 	tests := []struct {
 		name      string
-		store     Store
+		store     domain.Repository
 		wantIDs   []int64
 		wantEmpty bool
 	}{
@@ -248,14 +248,14 @@ func TestHandler_get(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		store      Store
+		store      domain.Repository
 		target     string
 		wantStatus int
 	}{
 		{
 			name: caseOK,
 			store: &fakeStore{get: func(_ context.Context, id int64) (*domain.WorkItem, error) {
-				return &domain.WorkItem{domain.WorkItem{ID: id, Title: titleMilk}, nil
+				return &domain.WorkItem{ID: id, Title: titleMilk}, nil
 			}},
 			target:     "/tasks/1",
 			wantStatus: http.StatusOK,
@@ -295,7 +295,7 @@ func TestHandler_update(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		store      Store
+		store      domain.Repository
 		body       string
 		wantStatus int
 	}{
@@ -342,7 +342,7 @@ func TestHandler_delete(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		store      Store
+		store      domain.Repository
 		target     string
 		wantStatus int
 	}{
@@ -398,7 +398,7 @@ func TestTask_Validate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			task := &domain.WorkItem{domain.WorkItem{Title: tt.title}
+			task := &domain.WorkItem{Title: tt.title}
 
 			err := task.Validate()
 
